@@ -1,0 +1,118 @@
+/* logo, nav */
+.brand-logo {
+    filter: invert(87%);
+}
+
+.dropdown-content {
+    background-color: #424242;
+    color: #BDBDBD;
+}
+
+nav .dropdown-content li.active, nav .dropdown-content li:hover, nav ul li.active, nav ul li:hover {
+    background-color: #217227;
+}
+
+.grey-text.text-darken-2 {
+    color: #BDBDBD!important;
+}
+
+.button-collapse, nav ul.right a {
+    color: #BDBDBD!important;
+}
+
+.button-collapse, nav ul.right li.active a {
+    color: #eee!important;
+}
+
+/* background */
+html {
+    color: #BDBDBD;
+}
+
+.full-background {
+    background: #121212;
+}
+
+/* cards */
+.collection.with-header .collection-header {
+    background-color: #212121;
+    border-bottom: 0;
+    color: #BDBDBD
+}
+
+.m-new-episodes{
+    background: #212121;
+    color: #BDBDBD;
+}
+
+.collection .collection-item {
+    background-color: #212121;
+    border-bottom: 0;
+}
+.collection {
+    border-radius: 4px;
+}
+
+.card, .card-panel {
+    background-color: #212121;
+    border-radius: 4px;
+}
+.m-series-score__value, .purple-text.text-darken-4, .purple-text{
+    color: #BDBDBD!important;
+}
+
+.dropdown-content li>a, .dropdown-content li>span {
+    color: #BDBDBD;
+}
+
+.dropdown-content li.active.selected {
+    background-color: #217227;
+}
+
+/* comments */
+.collection .collection-item.m-comment {
+    border-bottom: 0;
+}
+
+.m-comments {
+    background: #212121;
+}
+
+.collection .collection-item.m-comment:not(.m-comment-new-long-description):hover {
+    background-color:#424242;
+}
+
+.m-comment-author-name {
+    color: #BDBDBD;
+}
+
+/* search */
+
+.white {
+    background-color: #212121!important;
+}
+
+input[type=text].m-big-search-input {
+    border-top: 0!important;
+    border-left: 0!important;
+    border-right: 0!important;
+}
+
+/* footer */
+footer.page-footer {
+    margin-top: 20px;
+    padding-top: 20px;
+    background-color: #424242;
+}
+.orange {
+    background-color: #212121!important;
+}
+
+/* links */
+
+a {
+   color: #E0E0E0
+}
+a:hover:not(.btn):not(.btn-large) {
+    color: #fff;
+}
