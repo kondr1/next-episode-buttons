@@ -13,6 +13,7 @@
 import Settings from './Settings.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { ref, watch } from 'vue'
+import { PageObserver } from './pageObserver';
 
 const ok = ref(false)
 watch(ok, ok => {
@@ -21,6 +22,12 @@ watch(ok, ok => {
   } else {
     document.body.style.overflow = 'auto'
   }
+})
+
+PageObserver.addEventListener(PageObserver.VideoCaptured, (e) => {
+  const player = (e as CustomEvent).detail.node as HTMLDivElement
+  const playControl = (player.querySelector('.vjs-play-control.vjs-control') as HTMLDivElement)
+  if (playControl) playControl.click()
 })
 
 </script>

@@ -1,4 +1,4 @@
-import { Component, createApp, defineCustomElement } from "vue";
+import { App, Component, createApp, defineCustomElement } from "vue";
 import ContentRoot from "./ContentRoot.vue";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faGear, faArrowRight, faCaretRight } from '@fortawesome/free-solid-svg-icons'
@@ -20,14 +20,20 @@ library.add(faGear)
 library.add(faArrowRight)
 library.add(faCaretRight)
 
-function mountComponent(component: Component, parent: Element, id: string, style?: string): void {
+const apps: Record<string, App> = {}
+
+function mountComponent(component: Component, parent: Element, id: string, style?: string) {
     parent.ownerDocument.querySelector(`#${id}`)?.remove()
-    
+    apps[id]?.unmount()
+    apps[id] = createApp(component)
+
     const mountPoint = parent.ownerDocument.createElement("div")
 
     const root = parent.ownerDocument.createElement("div")
-    if (style) root.setAttribute('style', style)
     root.id = id
+    
+    style && root.setAttribute('style', style)
+    
     const styleTag = parent.ownerDocument.createElement("style")
     styleTag.innerHTML = indexCss
 
@@ -36,15 +42,24 @@ function mountComponent(component: Component, parent: Element, id: string, style
     shadow.appendChild(mountPoint)
     
     parent.appendChild(root)
-    createApp(component).mount(mountPoint)
+    apps[id].mount(mountPoint)
+    
+    return apps[id]
 }
 
-const mountButton = (e: Event)  =>
-    mountComponent(VideoControlRoot, (e as CustomEvent).detail.node, 'web-ext-control', 'position: absolute; z-index:10; right: 5mm; top: 5mm;')
+function mountButton(e: Event) {
+    const buttonsId = 'web-ext-control'
+    const app = mountComponent(VideoControlRoot, (e as CustomEvent).detail.node, buttonsId, 'position: absolute; z-index:10; right: 5mm; top: 5mm;');
+    function unmount() {
+        app.unmount();
+        PageObserver.removeEventListener(PageObserver.PageUpdate, unmount);
+    }
+    PageObserver.addEventListener(PageObserver.PageUpdate, unmount);
+}
 
 const mountRoot = () =>
     mountComponent(ContentRoot, document.body, 'web-ext-root')
 
 mountRoot()
 
-PageObserver.addEventListener('videoCaptured', mountButton)
+PageObserver.addEventListener(PageObserver.VideoCaptured, mountButton)

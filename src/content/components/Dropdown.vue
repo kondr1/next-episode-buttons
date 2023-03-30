@@ -47,7 +47,6 @@ import { ref } from 'vue';
 import DropdownInternal from './internal/DropdownInternal.vue';
 
 const props = defineProps<{
-    // value: string
     modelValue: string
 }>()
 

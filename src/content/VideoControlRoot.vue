@@ -1,56 +1,44 @@
 <template>
     <div class="inline-flex">
-        <Button :text="stopButtonText" @click="stopTimer" v-show="showControls" />
-        <Button :text="`▶| Следующая серия ${Math.round(timer.timeLeft.value/1000)}`" :href="nextEpisodeURL()" v-show="showControls" />
+        <Button :text="stopButtonText" @click="stopTimer" v-show="started" />
+        <Button :text="`▶| Следующая серия ${nextEpisodeTimer}`" @click="nextEpisodeClick" v-show="started" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onUnmounted, ref, watch } from 'vue';
 import Button from './components/Button.vue';
-import { timeLeft, nextEpisodeLink, PageObserver, nextEpisodeElement } from './pageObserver'
+import { duration, currentTime, nextEpisodeElement } from './pageObserver'
 import { Timer } from './Timer';
 import Settings from './settings';
+const timeLeft = computed(() => duration.value - currentTime.value)
+const { continueTimer, timeLeftLimit, continueAfterEnd } = Settings
 
-const { continueTimer, timeLeftLimit } = Settings
+function stopTimer() { timer.Stop(); manualStop.value = true; }
+function nextEpisodeClick() { nextEpisodeElement()?.click() }
+const manualStop = ref(false)
 
-function nextEpisodeURL() { return nextEpisodeLink() }
-function stopTimer() { showControls.value = false; userStop.value = true; }
+const timer = new Timer(continueTimer, nextEpisodeClick)
 
-const userStop = ref(false)
-const showControls = ref(false);
-
-let timer = new Timer(continueTimer.value, () => {
-    nextEpisodeElement()?.click();
-    showControls.value = false;
-})
+const nextEpisodeTimer = computed(() => Math.round(timer.timeLeft.value/1000))
+const { started } = timer
 
 const stopButtonText = computed(() => {
-    if (timeLeft.value > 0) {
-        return `Смотреть титры`
-    }
+    if (timeLeft.value > 0) return `Смотреть титры`
     return `Не открывать следующее видео`
 })
 
 watch(timeLeft, () => {
-    if (timeLeft.value < timeLeftLimit.value && !userStop.value){
-        showControls.value = true
-    }
-    if (timeLeft.value > timeLeftLimit.value && userStop.value){
-        userStop.value = false
-    }
-    if (timeLeft.value === 0){
-        showControls.value = true
-    }
+    if (timeLeft.value < timeLeftLimit.value && !manualStop.value)
+        timer.Start();
+    if (timeLeft.value > timeLeftLimit.value && timer.started.value)
+        timer.Stop();
+    if (timeLeft.value > timeLeftLimit.value && manualStop.value)
+        manualStop.value = false
+    if (timeLeft.value === 0 && continueAfterEnd.value)
+        timer.Start();
 })
 
-watch(showControls, () => {
-    if(showControls.value) {
-        if (timer.seconds !== continueTimer.value)
-            timer.seconds = continueTimer.value
-        timer.Start();
-    } else {
-        timer.Stop();
-    }
-})
+onBeforeUnmount(() => timer.Dispose() )
+onUnmounted(() => timer.Dispose() )
 </script>

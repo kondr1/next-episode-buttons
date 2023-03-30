@@ -1,8 +1,8 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 export const currentTime = ref(0)
 export const duration = ref(0)
-export const timeLeft = computed(() => duration.value - currentTime.value)
+
 export const nextEpisodeElement = () => (document.querySelector('.m-select-sibling-episode a:last-child') as HTMLAnchorElement | null)
 export const nextEpisodeLink = () => nextEpisodeElement()?.href || ""
 
@@ -12,11 +12,16 @@ export function getFrameDoc(): Document | null {
 function frameLog(msg: string): void {
     return console.log(`[${getFrameDoc()?.URL} | ${getFrameDoc()?.readyState}] ${msg}`)
 }
-const observerOpt: MutationObserverInit = { childList: true, attributes: true, attributeFilter: ['src'], attributeOldValue: true }
+const observerOpt: MutationObserverInit = { 
+    childList: true,
+    attributes: true,
+    attributeFilter: ['src'],
+    attributeOldValue: true
+}
 
 export class PageObserver extends EventTarget {
     
-    static capture(): void {
+    capture(): void {
         const video = getFrameDoc()?.querySelector('video')
         
         currentTime.value = video?.currentTime ?? 0
@@ -33,18 +38,22 @@ export class PageObserver extends EventTarget {
 
         if (video) {
             frameLog(`video duration was captured!`)
-            const event = new CustomEvent('videoCaptured', { detail: { node: video.parentElement } })
-            this.dispatchEvent(event)
+            const event = new CustomEvent(PageObserver.VideoCaptured, { detail: { node: video.parentElement } })
+            currentTime.value = video.currentTime
+            duration.value = video.duration
+            PageObserver.dispatchEvent(event)
         }
         else frameLog(`page have no video =(`)
     }
-
-    static updateFrameStateListener (): number | undefined {
+    static updateFrameStateListener(): number | undefined {
+        return PageObserver.instance.updateFrameStateListener()
+    }
+    updateFrameStateListener(): number | undefined {
         currentTime.value = 0
         duration.value = 0
+        
         if (!getFrameDoc()) return
         
-        frameLog(`updateRef call`)
         // TODO: fix this shit
         // i dont know why, but sometimes that just hapened =(
         if (getFrameDoc()?.URL === "about:blank") 
@@ -54,7 +63,8 @@ export class PageObserver extends EventTarget {
         else getFrameDoc()?.addEventListener('readystatechange', () => this.capture.apply(this))
     }
     
-    static iframeUpdateCallback (mutations: MutationRecord[], _: MutationObserver): void {
+    iframeUpdateCallback (mutations: MutationRecord[], _: MutationObserver): void {
+        console.log('mutation!')
         for(var mutation of mutations) {
             // @ts-ignore: ts(2488) Type must have a '[Symbol.iterator]()' method that returns an iterator.
             let ok = [...mutation.addedNodes]
@@ -62,22 +72,24 @@ export class PageObserver extends EventTarget {
                     .classList.contains('body-container'))
             
             if (ok) {
-                PageObserver.updateFrameStateListener()
-                PageObserver.instance.dispatchEvent(new Event('pageUpdate'))
+                this.updateFrameStateListener()
+                this.dispatchEvent(new Event(PageObserver.PageUpdate))
             }
         }
     }
 
+    static PageUpdate = 'pageUpdate'
+    static VideoCaptured = 'videoCaptured'
     static instance = new PageObserver()
-    static observer: MutationObserver = null!
+    observer: MutationObserver = null!
     
-    
-    constructor(){
+    constructor() {
         super()
         if (PageObserver.instance)
             return PageObserver.instance
-        PageObserver.observer = new MutationObserver(PageObserver.iframeUpdateCallback)
-        PageObserver.observer.observe(document.body as Node, observerOpt)
+        // console.log('Observer constructor')
+        this.observer = new MutationObserver(this.iframeUpdateCallback.bind(this))
+        this.observer.observe(document.body as Node, observerOpt)
     }
     static addEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void {
         PageObserver.instance.addEventListener(type, callback, options)

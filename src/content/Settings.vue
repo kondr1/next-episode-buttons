@@ -18,24 +18,28 @@
       <span class="text-white light:text-black mr-5">
           Обратный отсчет в секундах:
       </span><br/>
-      <input type="number" v-model="continueTimer" />
+      <input type="number" v-model="continueTimer" /><br/>
+      <span class="text-white light:text-black mr-5">
+        <input type="checkbox" v-model="continueAfterEnd" name="continueAfterEnd" />
+        <label for="continueAfterEnd">Включать обратный остчет, когда видео кончилось полностью.</label>
+      </span><br/>
+      
     </Card>
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive, watch } from 'vue';
+    import { reactive, watch } from 'vue';
     import Card from './components/Card.vue';
     import Dropdown from './components/Dropdown.vue';
     import MenuItem from './components/MenuItem.vue';
     import settings, { Theme } from './settings'
 
-    const { currentTheme, continueTimer, timeLeftLimit } = settings
+    const { currentTheme, continueTimer, timeLeftLimit, continueAfterEnd } = settings
     const themes: Theme[] = reactive(settings.themes)
 
     watch(currentTheme, name => {
       const val = themes.find(x => `${x.name} by ${x.author}` === name);
       if (!val) return
-      val.use()
       currentTheme.value = val.name
     })
 

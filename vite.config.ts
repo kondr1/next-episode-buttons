@@ -27,6 +27,7 @@ export default defineConfig({
     webExtension({
       assets: "public",
       webExtConfig: webExtConfig,
+      browser: "firefox",
       manifest: generateManifest,
       additionalInputs: [
         "src/index.css",
