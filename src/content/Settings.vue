@@ -1,7 +1,7 @@
 <template>
     <Card class="fixed top-1/3 left-1/3 w-max h-max z-20" title="Настройки расширения" caption="рычажки и кнопочки">
       <span class="dark:text-white light:text-black mr-5"> 
-        Сейчас установлена: {{ getCurrentTheme()?.name }}<br/>
+        Сейчас установлена: {{ currentTheme }}<br/>
         Автор: {{ getCurrentTheme()?.author }}<br/>
         <a :href="getCurrentTheme()?.url">{{ getCurrentTheme()?.url }}</a><br/>
       </span>
@@ -28,22 +28,18 @@
 </template>
 
 <script lang="ts" setup>
-    import { reactive, watch } from 'vue';
-    import Card from './components/Card.vue';
-    import Dropdown from './components/Dropdown.vue';
-    import MenuItem from './components/MenuItem.vue';
-    import settings, { Theme } from './settings'
+  import Card from './components/Card.vue';
+  import Dropdown from './components/Dropdown.vue';
+  import MenuItem from './components/MenuItem.vue';
+  import { Theme, themes, $currentTheme, $continueTimer, $timeLeftLimit, $continueAfterEnd } from './settings'
+  import { useVModel } from 'effector-vue/composition';
 
-    const { currentTheme, continueTimer, timeLeftLimit, continueAfterEnd } = settings
-    const themes: Theme[] = reactive(settings.themes)
+  const currentTheme = useVModel($currentTheme)
+  const continueTimer = useVModel($continueTimer)
+  const timeLeftLimit = useVModel($timeLeftLimit)
+  const continueAfterEnd = useVModel($continueAfterEnd)
 
-    watch(currentTheme, name => {
-      const val = themes.find(x => `${x.name} by ${x.author}` === name);
-      if (!val) return
-      currentTheme.value = val.name
-    })
-
-    function getCurrentTheme(): Theme | undefined {
-      return themes.find(x => x.name === currentTheme.value)
-    }
+  function getCurrentTheme(): Theme | undefined {
+    return themes.find(x => x.name === currentTheme.value)
+  }
 </script>

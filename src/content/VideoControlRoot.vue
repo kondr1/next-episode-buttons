@@ -1,44 +1,46 @@
 <template>
     <div class="inline-flex">
-        <Button :text="stopButtonText" @click="stopTimer" v-show="started" />
-        <Button :text="`▶| Следующая серия ${nextEpisodeTimer}`" @click="nextEpisodeClick" v-show="started" />
+        <Button :text="stopButtonText" @click="stopTimer" v-show="working" />
+        <Button :text="`▶| Следующая серия ${left}`" @click="nextEpisodeClick" v-show="working" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onUnmounted, ref, watch } from 'vue';
 import Button from './components/Button.vue';
-import { duration, currentTime, nextEpisodeElement } from './pageObserver'
-import { Timer } from './Timer';
-import Settings from './settings';
-const timeLeft = computed(() => duration.value - currentTime.value)
-const { continueTimer, timeLeftLimit, continueAfterEnd } = Settings
+import { $timeLeft, nextEpisodeElement } from './pageObserver'
+import { startCountdown, abortCountdown, $left, $working } from './Timer';
+import { $continueTimer, $timeLeftLimit, $continueAfterEnd }  from './settings';
+import { useStore } from 'effector-vue/composition';
 
-function stopTimer() { timer.Stop(); manualStop.value = true; }
+const timeLeft = useStore($timeLeft)
+const continueTimer = useStore($continueTimer)
+const timeLeftLimit = useStore($timeLeftLimit)
+const continueAfterEnd = useStore($continueAfterEnd)
+const left = useStore($left)
+const working = useStore($working)
+
+function stopTimer() { abortCountdown(); manualStop.value = true; }
 function nextEpisodeClick() { nextEpisodeElement()?.click() }
 const manualStop = ref(false)
 
-const timer = new Timer(continueTimer, nextEpisodeClick)
-
-const nextEpisodeTimer = computed(() => Math.round(timer.timeLeft.value/1000))
-const { started } = timer
 
 const stopButtonText = computed(() => {
     if (timeLeft.value > 0) return `Смотреть титры`
     return `Не открывать следующее видео`
 })
 
-watch(timeLeft, () => {
-    if (timeLeft.value < timeLeftLimit.value && !manualStop.value)
-        timer.Start();
-    if (timeLeft.value > timeLeftLimit.value && timer.started.value)
-        timer.Stop();
-    if (timeLeft.value > timeLeftLimit.value && manualStop.value)
+watch(timeLeft, (value) => {
+    if (value < timeLeftLimit.value && !manualStop.value)
+        startCountdown(continueTimer.value);
+    if (value > timeLeftLimit.value && working.value)
+        abortCountdown();
+    if (value > timeLeftLimit.value && manualStop.value)
         manualStop.value = false
-    if (timeLeft.value === 0 && continueAfterEnd.value)
-        timer.Start();
+    if (value === 0 && continueAfterEnd.value)
+        startCountdown(continueTimer.value);
 })
 
-onBeforeUnmount(() => timer.Dispose() )
-onUnmounted(() => timer.Dispose() )
+onBeforeUnmount(() => abortCountdown() )
+onUnmounted(() => abortCountdown() )
 </script>

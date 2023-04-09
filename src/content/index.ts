@@ -5,7 +5,7 @@ import { faGear, faArrowRight, faCaretRight } from '@fortawesome/free-solid-svg-
 import VideoControlRoot from "./VideoControlRoot.vue";
 import { PageObserver } from './pageObserver'
 import indexCss from '../index.css?inline'
-import { get } from './settingsBase'
+import { get } from './settings'
 
 
 const css = get('style-css')

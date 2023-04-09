@@ -1,7 +1,18 @@
-import { ref } from 'vue'
+import { createStore, createEvent, sample, combine } from 'effector'
 
-export const currentTime = ref(0)
-export const duration = ref(0)
+const currentTimeChanged = createEvent<number>()
+const durationChanged = createEvent<number>()
+export const $currentTime = createStore(0)
+export const $duration = createStore(0)
+export const $timeLeft = combine($duration, $currentTime, (duration, currentTime) => duration - currentTime)
+sample({
+    clock: currentTimeChanged,
+    target: $currentTime,
+})
+sample({
+    clock: durationChanged,
+    target: $duration,
+})
 
 export const nextEpisodeElement = () => (document.querySelector('.m-select-sibling-episode a:last-child') as HTMLAnchorElement | null)
 export const nextEpisodeLink = () => nextEpisodeElement()?.href || ""
@@ -24,11 +35,11 @@ export class PageObserver extends EventTarget {
     capture(): void {
         const video = getFrameDoc()?.querySelector('video')
         
-        currentTime.value = video?.currentTime ?? 0
-        duration.value = video?.duration ?? 0
+        currentTimeChanged(video?.currentTime ?? 0)
+        durationChanged(video?.duration ?? 0)
         
-        const updateTime =  () => { currentTime.value = video!.currentTime }
-        const updateDuration =  () => { duration.value = video!.duration }
+        const updateTime = () => currentTimeChanged(video!.currentTime) 
+        const updateDuration = () => durationChanged(video!.duration)
         
         video?.removeEventListener('timeupdate', updateTime);
         video?.removeEventListener('durationchange', updateDuration);
@@ -39,8 +50,8 @@ export class PageObserver extends EventTarget {
         if (video) {
             frameLog(`video duration was captured!`)
             const event = new CustomEvent(PageObserver.VideoCaptured, { detail: { node: video.parentElement } })
-            currentTime.value = video.currentTime
-            duration.value = video.duration
+            currentTimeChanged(video.currentTime)
+            durationChanged(video.duration)
             PageObserver.dispatchEvent(event)
         }
         else frameLog(`page have no video =(`)
@@ -49,8 +60,8 @@ export class PageObserver extends EventTarget {
         return PageObserver.instance.updateFrameStateListener()
     }
     updateFrameStateListener(): number | undefined {
-        currentTime.value = 0
-        duration.value = 0
+        currentTimeChanged(0)
+        durationChanged(0)
         
         if (!getFrameDoc()) return
         

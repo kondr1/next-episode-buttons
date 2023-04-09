@@ -1324,6 +1324,21 @@ ecdsa-sig-formatter@1.0.11:
   dependencies:
     safe-buffer "^5.0.1"
 
+effector-storage@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/effector-storage/-/effector-storage-5.0.1.tgz#c5cbaffafd068852ae1105e406e230df2500bd62"
+  integrity sha512-XJQTLEKUoO8vZROyxtY1J6SfK5Z0YdDGcwEYjhQNOiMtE6HcdJ9cagiCK2r0unsq8eEIS2GzB8cWPrIWJRepxA==
+
+effector-vue@^22.2.0:
+  version "22.2.0"
+  resolved "https://registry.yarnpkg.com/effector-vue/-/effector-vue-22.2.0.tgz#45ccf96180556a918d5954f9e780f4a4eef24197"
+  integrity sha512-ltiGrWizwBFXuIL0KuW11GXl253/AI/xSnSR1EtWlgDobzzEZ9G6gV6eUmcC36S4Jo34K7FJpKTmE/ODfGED6w==
+
+effector@^22.7.0:
+  version "22.7.0"
+  resolved "https://registry.yarnpkg.com/effector/-/effector-22.7.0.tgz#439b4fa300cd84797e09b6e778065642a36028a0"
+  integrity sha512-C3jMCjRmU/j7Mu04q0zm45OYglQB9fYxSHNu51UrV77VDZJRs7nFmNfNiaXmgkKOnsUP4VuyE64aiSvAZWZo7g==
+
 electron-to-chromium@^1.4.251:
   version "1.4.284"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.284.tgz#61046d1e4cab3a25238f6bf7413795270f125592"

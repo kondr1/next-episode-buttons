@@ -11,6 +11,9 @@
     "@fortawesome/fontawesome-svg-core": "^6.2.1",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
     "@fortawesome/vue-fontawesome": "^3.0.3",
+    "effector": "^22.7.0",
+    "effector-storage": "^5.0.1",
+    "effector-vue": "^22.2.0",
     "vue": "^3.2.45",
     "vue-shadow-dom": "^4.2.0"
   },

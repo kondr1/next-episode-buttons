@@ -1,7 +1,12 @@
-import { Ref, ref, watch } from 'vue'
+import { createEvent, restore } from 'effector'
+import { persist } from 'effector-storage/local'
 import negative from './customStyles/negative.css?inline'
-import SettingsBase from './settingsBase'
-import { remove, set, get } from './settingsBase'
+
+export const storageKey = "web-ext-"
+export const key = (name: string) => storageKey + name
+export const set = (name:string, val:any) => localStorage.setItem(key(name), val.toString())
+export const get = (name:string) => localStorage.getItem(key(name))
+export const remove = (name:string) => localStorage.removeItem(key(name))
 
 export class Theme {
     constructor(name: string, author: string, url: string, css?: string) {
@@ -16,7 +21,6 @@ export class Theme {
     css?: string
     use() {
         let style = document.querySelector("#web-ext-style")
-        Settings.instance.currentTheme.value = this.name
         if (!style) style = document.createElement("style");
         if (!this.css){
             style.remove()
@@ -30,45 +34,24 @@ export class Theme {
     }
 }
 
-const themes: Theme[] = [
+export const themes: Theme[] = [
     new Theme("Default", "anime365", "https://smotret-anime.com/"),
     new Theme("Colorfull Negative", "kondr1", "https://github.com/kondr1/", negative)
 ]
 
-export class Settings extends SettingsBase {
-    public static readonly instance = new Settings(themes)
-    constructor(themes: Theme[]) {
-        super()
-        this.themes = themes
-        if (this.#timeLeftLimit === 0)
-            this.timeLeftLimit.value = 120 // 2 min
-        if (this.#continueTimer === 0)
-            this.continueTimer.value = 15 // 15 sec
-        watch(this.currentTheme, (value) => this.themes.find(x => x.name === value)?.use())
-        this.watchAndSyncStr("currentTheme", this.currentTheme)
-        this.watchAndSyncNum("timeLeftLimit", this.timeLeftLimit)
-        this.watchAndSyncNum("continueTimer", this.continueTimer)
-        this.watchAndSyncBool("continueAfterEnd", this.continueAfterEnd)
-    }
+export const currentThemeChanged = createEvent<string>()
+export const $currentTheme = restore(currentThemeChanged, "Default")
+persist({ store: $currentTheme, key: "web-ext-currentTheme" })
+$currentTheme.watch((value) => themes.find(x => x.name === value)?.use())
 
-    themes: Theme[]
-    currentTheme: Ref<string> = ref(this.#currentTheme)
-    timeLeftLimit: Ref<number> = ref(this.#timeLeftLimit)
-    continueTimer: Ref<number> = ref(this.#continueTimer)
-    continueAfterEnd: Ref<boolean> = ref(this.#continueAfterEnd)
+export const timeLeftLimitChanged = createEvent<number>()
+export const $timeLeftLimit = restore(timeLeftLimitChanged, 120)
+persist({ store: $timeLeftLimit, key: "web-ext-timeLeftLimit" })
 
-    get #currentTheme() {
-        return get("currentTheme") ?? "Default"
-    };
-    get #timeLeftLimit() {
-        return Number(get("timeLeftLimit") ?? 0)
-    };
-    get #continueTimer() {
-        return Number(get("continueTimer") ?? 0)
-    };
-    get #continueAfterEnd() {
-        return Boolean(get("continueAfterEnd") ?? true)
-    };
-}
+export const continueTimerChanged = createEvent<number>()
+export const $continueTimer = restore(continueTimerChanged, 15)
+persist({ store: $continueTimer, key: "web-ext-continueTimer" })
 
-export default Settings.instance
+export const continueAfterEndChanged = createEvent<boolean>()
+export const $continueAfterEnd = restore(continueAfterEndChanged, true)
+persist({ store: $continueAfterEnd, key: "web-ext-continueAfterEnd" })
