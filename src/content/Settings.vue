@@ -9,7 +9,7 @@
           Тема: 
       </span>
       <Dropdown v-model="currentTheme" >
-        <MenuItem v-for="t in themes" :value="`${t.name} by ${t.author}`" :key="t.name" />
+        <MenuItem v-for="t in themes" :value="t.name" :key="t.name" />
       </Dropdown><br/>
       <span class="text-white light:text-black mr-5">
           За сколько секунд до конца серии начинать обратный отсчет:
@@ -31,11 +31,12 @@
   import Card from './components/Card.vue';
   import Dropdown from './components/Dropdown.vue';
   import MenuItem from './components/MenuItem.vue';
-  import { Theme, themes, $currentTheme, $continueTimer, $timeLeftLimit, $continueAfterEnd } from './settings'
-  import { useVModel } from 'effector-vue/composition';
+  import { Theme, themes, $currentTheme, $nextEpButtonTimer, $timeLeftLimit, $continueAfterEnd,currentThemeChanged  } from './settings'
+  import { useStore, useVModel } from 'effector-vue/composition';
 
   const currentTheme = useVModel($currentTheme)
-  const continueTimer = useVModel($continueTimer)
+
+  const continueTimer = useVModel($nextEpButtonTimer)
   const timeLeftLimit = useVModel($timeLeftLimit)
   const continueAfterEnd = useVModel($continueAfterEnd)
 

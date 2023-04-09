@@ -17,7 +17,8 @@ export function createCountdown(
     const $working = createStore(true, { name: `${name}Working` })
     const $left = createStore(0, { name: `${name}Left` })
     const tick = createEvent<number>(`${name}Tick`)
-    const timer = createEffect<number, void>(async () => await wait(timeout))
+    const timer = createEffect<number, void>(() => wait(timeout))
+    const timerFinished = createEvent()
 
     $working.on(abort, () => false)
 
@@ -45,20 +46,18 @@ export function createCountdown(
 
     sample({
         clock: tick,
+        filter: (t) => t === 0,
+        target: timerFinished
+    })
+
+    sample({
+        clock: tick,
         target: $left,
     })
 
-    return { tick, $left, $working }
+    return { tick, $left, $working, timerFinished }
 }
 
-export const startCountdown = createEvent<number>()
-export const abortCountdown = createEvent()
 
-const countdown = createCountdown('example', {
-    start: startCountdown,
-    abort: abortCountdown
-})
 
-export const $left = countdown.$left
-export const $working = countdown.$working
 

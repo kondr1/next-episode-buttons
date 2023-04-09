@@ -4,7 +4,7 @@ const currentTimeChanged = createEvent<number>()
 const durationChanged = createEvent<number>()
 export const $currentTime = createStore(0)
 export const $duration = createStore(0)
-export const $timeLeft = combine($duration, $currentTime, (duration, currentTime) => duration - currentTime)
+export const $timeLeftVideo = combine($duration, $currentTime, (duration, currentTime) => duration - currentTime)
 sample({
     clock: currentTimeChanged,
     target: $currentTime,

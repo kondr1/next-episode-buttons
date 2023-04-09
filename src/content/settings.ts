@@ -41,16 +41,22 @@ export const themes: Theme[] = [
 
 export const currentThemeChanged = createEvent<string>()
 export const $currentTheme = restore(currentThemeChanged, "Default")
+export const $theme = $currentTheme.map(theme => {
+    return {theme: themes.find(v => v.name === theme)}
+})
 persist({ store: $currentTheme, key: "web-ext-currentTheme" })
-$currentTheme.watch((value) => themes.find(x => x.name === value)?.use())
+
+$theme.watch(({theme}) => {
+    theme?.use()
+})
 
 export const timeLeftLimitChanged = createEvent<number>()
 export const $timeLeftLimit = restore(timeLeftLimitChanged, 120)
 persist({ store: $timeLeftLimit, key: "web-ext-timeLeftLimit" })
 
 export const continueTimerChanged = createEvent<number>()
-export const $continueTimer = restore(continueTimerChanged, 15)
-persist({ store: $continueTimer, key: "web-ext-continueTimer" })
+export const $nextEpButtonTimer = restore(continueTimerChanged, 15)
+persist({ store: $nextEpButtonTimer, key: "web-ext-continueTimer" })
 
 export const continueAfterEndChanged = createEvent<boolean>()
 export const $continueAfterEnd = restore(continueAfterEndChanged, true)
