@@ -1,5 +1,6 @@
+// eslint-disable-next-line
 module.exports = {
-  env: { browser: true, es2020: true },
+  env: {browser: true, es2020: true},
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -8,7 +9,7 @@ module.exports = {
     'prettier',
   ],
   parser: '@typescript-eslint/parser',
-  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  parserOptions: {ecmaVersion: 'latest', sourceType: 'module'},
   plugins: ['react-refresh', 'effector', 'prettier'],
   rules: {
     'react-refresh/only-export-components': 'warn',
